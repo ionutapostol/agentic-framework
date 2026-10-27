@@ -1,0 +1,13 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","[Describe the scenario being tested — plain sentence, no TC-prefix]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Navigate to [MENU PATH] (e.g. ORD00, Orders → ORD01, Order Portal → click New)","The [Screen Name] opens in a new tab",,,,
+,,,"3","[Perform the action being tested] (e.g. click New / click a record / change a field value)","[Expected UI state after the action]",,,,
+,,,"4","[Verify the result] (e.g. check field values / check buttons / check grid content)","[Measurable expected result visible in the UI]",,,,
+,,,"5","[Optional: Save / confirm / close]","[Expected outcome after save — e.g. success message, status change, navigation back to portal]",,,,
+
+"","Test Case","[Second test case title]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Navigate to [MENU PATH]","The [Screen Name] opens",,,,
+,,,"3","[Action step]","[Expected result]",,,,
+,,,"4","[Assertion step]","[Expected result]",,,,

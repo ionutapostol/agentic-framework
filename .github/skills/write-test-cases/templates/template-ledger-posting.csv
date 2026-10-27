@@ -1,0 +1,44 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","[Describe the ledger posting scenario — plain sentence, e.g. 'Ledger posting is sent to LEDGER immediately after order confirmation']",,,,"ShopApp\Your Team","","Design",[COMPONENT — use ORD/PAY/SHP/INV depending on which module initiates the posting]
+,,,"1","Create [entity] with Status = <Status>, AccountNumber = <AccountNumber>, CurrencyISOCode = <Currency>, OrderTotal = <Amount>, and <CorrelationId>","[Entity] is stored in [MODULE] with the listed values and CorrelationId = <CorrelationId>",,,,
+,,,"2","Trigger the action that initiates the ledger posting: [e.g. confirm the order / grant approval / trigger the service call]","The [MODULE] module submits a CreateSinglePostingCommand to LEDGER realtime",,,,
+,,,"3","Search LEDGER postings using <CorrelationId> or <AccountNumber>","Exactly one posting is found with PostingId = [e.g. 'ORD' + <DateTime> + <AccountNumber> + 'Confirm']",,,,
+,,,"4","Open PostingId = <PostingId> in LEDGER and inspect its posting header","LEDGER displays these posting header values:
+- BusinessTypeCode = '[e.g. Sale / Subscription / Shipment]'
+- Description = '[e.g. Order Confirmed <AccountNumber>]'
+- IsFinal = '[Yes / No]'
+- Source = '[e.g. ORD / PAY / SHP]'
+- Posting Group = [not included / GroupTypeCode = '...', GroupReference = '...']",,,,
+,,,"5","Inspect the order posting for <PostingId> in LEDGER","LEDGER displays these order posting values:
+- OrderPostingTypeCode = '[e.g. OrderOpen / OrderClose / FeeCharge]'
+- CaseTypeCode = '[e.g. ConfirmedOrder / CancelledOrder]'
+- PostingDate = <BusinessDate>
+- ValueDate = <ValueDate>
+- StoreUniqueIdentifier = <StoreNumber>
+- StoreClass = [Retail / Wholesale / Internal]
+- StoreType = [as stored on Store]",,,,
+,,,"6","Inspect the 1st account line for <PostingId> in LEDGER","LEDGER displays these 1st account line values:
+- AccountUniqueIdentifier = [e.g. Order.AccountNumber]
+- AccountTypeCode = '[e.g. R for Receivable account]'
+- BookCurrencyISOCode = <CurrencyISOCode>
+- UnitPrice = 1
+- AttributionTypeCode = '[e.g. Goods — check authoritative Attribution type reference page]'
+- SourceCurrencyAmount = [e.g. OrderTotal * -1] (rounded to currency decimals)
+- BookCurrencyAmount = SourceCurrencyAmount",,,,
+,,,"7","Inspect the 2nd account line for <PostingId> in LEDGER (if applicable)","LEDGER displays these 2nd account line values:
+- AccountUniqueIdentifier = [e.g. Order.BillingAccountNumber]
+- AccountTypeCode = '[e.g. B or S depending on BillingAccount type]'
+- BookCurrencyISOCode = <CurrencyISOCode>
+- UnitPrice = 1
+- AttributionTypeCode = '[e.g. Goods — check authoritative Attribution type reference page]'
+- SourceCurrencyAmount = [e.g. OrderTotal * +1] (rounded to currency decimals)
+- BookCurrencyAmount = SourceCurrencyAmount",,,,
+
+"","Test Case","[Second ledger posting test case — e.g. a different trigger condition or a different account type]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+,,,"1","Create [entity] with [variant field] = <VariantValue>, <AccountNumber>, and <CorrelationId>","[Entity] is stored with VariantField = <VariantValue> and CorrelationId = <CorrelationId>",,,,
+,,,"2","Trigger [named action] for <CorrelationId>","CreateSinglePostingCommand is submitted to LEDGER for CorrelationId = <CorrelationId>",,,,
+,,,"3","Search LEDGER postings using <CorrelationId> or <AccountNumber>","Exactly one posting is found with PostingId = <ExpectedPostingId>",,,,
+,,,"4","Open <PostingId> in LEDGER and inspect its posting header","[HeaderFieldA = <ExpectedA>; HeaderFieldB = <ExpectedB>]",,,,
+,,,"5","Inspect the order posting for <PostingId> in LEDGER","[OrderPostingTypeCode = <ExpectedType>; CaseTypeCode = <ExpectedCase>]",,,,
+,,,"6","Inspect the 1st account line for <PostingId> in LEDGER","[AccountUniqueIdentifier = <ExpectedAccount>; AttributionTypeCode = <ExpectedAttribution>; SourceCurrencyAmount = <ExpectedAmount>]",,,,
+,,,"7","Inspect the 2nd account line for <PostingId> in LEDGER","[AccountUniqueIdentifier = <ExpectedBillingAccount>; AttributionTypeCode = <ExpectedAttribution>; SourceCurrencyAmount = <ExpectedAmount>]",,,,

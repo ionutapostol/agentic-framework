@@ -1,0 +1,434 @@
+{
+  "version": "1.0",
+  "skill": "write-test-cases",
+  "description": "Evaluation suite for the write-test-cases skill. Covers skill triggering, CSV format correctness, navigation paths, and output quality.",
+
+  "evaluations": [
+
+    {
+      "id": "EVAL-TRIGGER-001",
+      "category": "skill_triggering",
+      "description": "Skill is triggered when user asks to create test cases for a portal feature",
+      "prompt": "create test cases for the order entry screen based on the requirements at .github/skills/write-test-cases/requirements/order-entry.md",
+      "expected": {
+        "skill_triggered": true,
+        "skill_name": "write-test-cases",
+        "output_file_created": true,
+        "output_path_pattern": "qa-output/test-cases/*.csv"
+      }
+    },
+
+    {
+      "id": "EVAL-TRIGGER-002",
+      "category": "skill_triggering",
+      "description": "Skill is triggered when user asks to create test cases for a backend service",
+      "prompt": "create test cases for the service fee calculation based on .github/skills/write-test-cases/requirements/service-fee-calculation.md",
+      "expected": {
+        "skill_triggered": true,
+        "skill_name": "write-test-cases",
+        "output_file_created": true,
+        "output_path_pattern": "qa-output/test-cases/*.csv"
+      }
+    },
+
+    {
+      "id": "EVAL-TRIGGER-003",
+      "category": "skill_triggering",
+      "description": "Skill is triggered on natural phrasing without explicit skill mention",
+      "prompt": "plan QA for the order confirmation posting flow",
+      "expected": {
+        "skill_triggered": true,
+        "skill_name": "write-test-cases"
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-001",
+      "category": "csv_format",
+      "description": "Test Case header row has correct Work Item Type",
+      "rule": "Every test case header row must have Work Item Type = \"Test Case\"",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "csv_rows_where_title_is_populated",
+        "pattern": "^\"\",\"(?!Test Case)[^\"]+\"",
+        "error_message": "Found a test case header row with incorrect Work Item Type (expected 'Test Case')"
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-002",
+      "category": "csv_format",
+      "description": "Shared Steps row only appears with a real numeric ID, never with an empty ID",
+      "rule": "\"Shared Steps\" in the Work Item Type column must always be paired with a real numeric ID in the ID column. Empty ID + Shared Steps is forbidden.",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "all_csv_rows",
+        "pattern": "^\"\",\"Shared Steps\"",
+        "error_message": "Found a row with empty ID and Work Item Type = 'Shared Steps'. Use bare ,, for step rows that don't reference a shared step."
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-007",
+      "category": "csv_format",
+      "description": "Test Case header rows must always have an empty ID",
+      "rule": "The ID column must be empty on every Test Case row, including rows copied from exports or existing CSV files. Only Shared Steps references may contain an existing work item ID.",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "test_case_header_rows",
+        "pattern": "^\"[^\"]+\",\"Test Case\"",
+        "error_message": "Found a populated Test Case ID. Clear the ID so manual Azure DevOps import creates the test case instead of trying to update an existing work item."
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-003",
+      "category": "csv_format",
+      "description": "Test case titles must not contain TC-F-XXX: or TC-E-XXX: prefixes",
+      "rule": "Title values in the CSV must not be prefixed with TC-[A-Z]+-[0-9]+:",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "title_column_values",
+        "pattern": "TC-[A-Z]+-[0-9]+:",
+        "error_message": "Found a test case title with a TC-prefix (e.g. TC-F-001:). Strip the prefix — titles must be plain descriptive sentences."
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-004",
+      "category": "csv_format",
+      "description": "CSV must use the correct column headers",
+      "rule": "First row of every generated CSV must exactly match the required header",
+      "assertion": {
+        "type": "exact_match",
+        "target": "first_row",
+        "expected": "ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "error_message": "CSV header row does not match the required format. Check column order and names."
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-005",
+      "category": "csv_format",
+      "description": "Output file must be created in qa-output/test-cases/ or its sprint subdirectory",
+      "rule": "Generated CSV files must be placed at qa-output/test-cases/<name>-test-cases.csv or qa-output/test-cases/sprint-<slug>/<name>-test-cases.csv relative to the repo root",
+      "assertion": {
+        "type": "path_match",
+        "target": "output_file_path",
+        "pattern": "^qa-output/test-cases/(?:sprint-[\\w-]+/)?[\\w-]+-test-cases\\.csv$",
+        "error_message": "Output file was not written to qa-output/test-cases/ or one sprint-<slug> child directory. Do not save inside the skill folder, tests/, or deeper nested folders."
+      }
+    },
+
+    {
+      "id": "EVAL-FORMAT-006",
+      "category": "csv_format",
+      "description": "Every non-empty CSV row must match the 10-column header width",
+      "rule": "Test case, shared-step, and step rows must each contain exactly 10 CSV fields",
+      "assertion": {
+        "type": "column_count",
+        "target": "all_non_empty_rows",
+        "expected": 10,
+        "error_message": "A CSV row has extra or missing fields. Every non-empty row must contain exactly 10 columns."
+      }
+    },
+
+    {
+      "id": "EVAL-NAV-001",
+      "category": "navigation_paths",
+      "description": "Old-style navigation paths must not appear in generated test cases",
+      "rule": "Navigation steps must not reference ORDER02 → OrderOrder02 or similar old-style paths",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "step_action_column_values",
+        "pattern": "ORDER02|OrderOrder02|PAY02|SHP02",
+        "error_message": "Found an old-style navigation path. Use ORD00, Orders → ORD01, Order Portal (or PAY00/SHP00 equivalents)."
+      }
+    },
+
+    {
+      "id": "EVAL-NAV-003",
+      "category": "navigation_paths",
+      "description": "SHP portal navigation must use SHP01, Shipment Portal",
+      "rule": "Portal navigation for Shipments must use: SHP00, Shipments → SHP01, Shipment Portal — not 'SHP00, Shipments' alone",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "step_action_column_values",
+        "pattern": "SHP00, Shipments(?! →)",
+        "error_message": "SHP portal navigation step uses 'SHP00, Shipments' without a sub-screen. Use 'SHP00, Shipments → SHP01, Shipment Portal'."
+      }
+    },
+
+    {
+      "id": "EVAL-NAV-004",
+      "category": "navigation_paths",
+      "description": "Navigation step and Details-open step must be separate rows",
+      "rule": "A step that navigates to a portal/list and a step that opens a record's Details screen must appear as two separate step rows, not combined in a single step",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "If a Step Action contains both a portal navigation verb and 'Open the Details screen' or 'open details', it is combining two actions into one step — split them",
+        "error_message": "Found a step combining portal navigation with opening a Details screen. Split into two steps: Step N = navigate to portal, Step N+1 = open the Details screen."
+      }
+    },
+
+
+    {
+      "id": "EVAL-NAV-002",
+      "category": "navigation_paths",
+      "description": "Order portal navigation must follow the correct path",
+      "rule": "Portal navigation for Orders must use: ORD00, Orders → ORD01, Order Portal",
+      "assertion": {
+        "type": "regex_match_when_order_portal",
+        "target": "step_action_column_values",
+        "pattern": "ORD00, Orders → ORD01, Order Portal",
+        "error_message": "Order portal navigation step does not use the correct path format."
+      }
+    },
+
+    {
+      "id": "EVAL-NAV-005",
+      "category": "navigation_paths",
+      "description": "Clicking New from Order Portal must produce correct expected result",
+      "rule": "When a step action says 'click New', the expected result must state 'The Order Entry screen opens in a new tab'",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "If Step Action contains 'click New' in the context of the Order Portal, Step Expected must reference 'Order Entry screen opens in a new tab'",
+        "error_message": "After 'click New' from Order Portal, expected result should state the Order Entry screen opens in a new tab."
+      }
+    },
+
+    {
+      "id": "EVAL-TEMPLATE-001",
+      "category": "template_selection",
+      "description": "Portal/UI tests use the Login shared step (ID 1000)",
+      "rule": "Any test case for a portal feature must include a Login step row referencing shared step ID 1000",
+      "assertion": {
+        "type": "conditional_presence",
+        "condition": "test_touches_portal_ui",
+        "required_row_pattern": "\"1000\",\"Shared Steps\",,\"1\",\"Login\"",
+        "error_message": "Portal test case is missing the Login shared step row (\"1000\",\"Shared Steps\",,\"1\",\"Login\")."
+      }
+    },
+
+    {
+      "id": "EVAL-TEMPLATE-002",
+      "category": "template_selection",
+      "description": "Service/backend tests must not include a Login step",
+      "rule": "Test cases for backend services (no UI, no portal) must not include a Login shared step",
+      "assertion": {
+        "type": "conditional_absence",
+        "condition": "test_is_backend_service",
+        "forbidden_row_pattern": "\"1000\",\"Shared Steps\"",
+        "error_message": "Backend/service test case should not include the Login shared step. Login is only for portal/UI tests."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-001",
+      "category": "output_quality",
+      "description": "Every test case must have at least one step",
+      "rule": "A test case header row must be followed by at least one step row before the next test case or end of file",
+      "assertion": {
+        "type": "structural_check",
+        "description": "No test case header row should be immediately followed by another test case header row or end of file",
+        "error_message": "Found a test case with no steps. Every test case must have at least one step action."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-002",
+      "category": "output_quality",
+      "description": "Step Expected column must not be empty for assertion steps",
+      "rule": "Steps that verify or assert outcomes must have a non-empty Step Expected value",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "Any step with a verification verb (verify, check, inspect, confirm, assert) must have a non-empty Step Expected value",
+        "error_message": "Found an assertion step with an empty Step Expected column. Expected results must be measurable and verifiable."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-003",
+      "category": "output_quality",
+      "description": "Happy path must be covered when generating full test cases",
+      "rule": "Generated test cases must include at least one test covering the primary success flow of the feature",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "At least one test case should represent the main success scenario (happy path) with valid inputs and expected positive outcomes",
+        "error_message": "No happy path test case found. The primary success flow must be covered."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-004",
+      "category": "output_quality",
+      "description": "Area Path must be set on every test case header row",
+      "rule": "The Area Path column on every Test Case header row must not be empty",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "test_case_header_rows",
+        "pattern": "\"Test Case\",\"[^\"]+\",,,,[\\s]*,",
+        "error_message": "Found a test case with an empty Area Path. Area Path must be set (e.g. 'ShopApp\\Your Team')."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-005",
+      "category": "output_quality",
+      "description": "Step actions must use executable setup language",
+      "rule": "Step actions must describe the concrete data creation or user action and must not use the generic phrase 'Prepare preconditions'",
+      "assertion": {
+        "type": "regex_not_match",
+        "target": "step_action_column_values",
+        "pattern": "(?i)prepare preconditions",
+        "error_message": "Replace generic 'Prepare preconditions' wording with the exact data creation or user action."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-006",
+      "category": "output_quality",
+      "description": "Expected results must state exact observable values",
+      "rule": "Backend expected results must contain requirement-backed field/value assignments, formulas, status codes, or exact numeric or word-number counts; vague success or mapping language alone, including assignments such as 'Result = success' or 'Fields = mapped', is invalid",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "Backend assertions include an exact field/value assignment, formula, HTTP status, or count; concrete counts such as 'One record is returned' are valid, while generic assignment values such as success, mapped, correct, expected, or OK are not",
+        "error_message": "Replace vague success or mapping language with exact requirement-backed field names and expected values."
+      }
+    },
+
+    {
+      "id": "EVAL-QUALITY-007",
+      "category": "output_quality",
+      "description": "Backend assertions must name an observation point and correlation key",
+      "rule": "A backend request, response, command, message, processing record, principal assertion, or non-portal data-table assertion must identify the UI, API, database, log, trace, queue, topic, table, or file used to observe it and the identifier used to find the same transaction",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "Backend assertion verbs include assert and validate as well as inspect, verify, check, confirm, search, and query. Such steps name both a concrete observation surface and a correlation key such as CorrelationId, SenderReference, AccountNumber, or PostingId. Ordinary SHP01/ORD01 portal result tables remain UI assertions, not backend data-table assertions",
+        "error_message": "Backend assertion is not independently executable. Name the observation point and correlation key."
+      }
+    },
+
+    {
+      "id": "EVAL-CHECKLIST-001",
+      "category": "checklist_format",
+      "description": "Test execution checklists use literal hyphen-list items in the correct output directory",
+      "rule": "Each .txt checklist line starts with '- ' followed by Happy path:, Edge case:, Error handling:, or State transition:. Sprint checklists are stored in qa-output/test-cases/sprint-<slug>/checklists/; standalone checklists may use qa-output/test-cases/. No heading, number, checkbox, bracketed category tag, or additional formatting is allowed",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "Every line uses '- Happy path:', '- Edge case:', '- Error handling:', or '- State transition:'. The sprint checklist directory is created when absent",
+        "error_message": "Checklist must use literal hyphen items and the correct standalone or sprint checklist directory."
+      }
+    },
+
+    {
+      "id": "EVAL-CHECKLIST-002",
+      "category": "checklist_format",
+      "description": "Test execution checklists include mandatory happy-path, edge-case, and error-handling coverage",
+      "rule": "Every checklist contains at least one requirement-backed Happy path, Edge case, and Error handling item. State transitions are included when applicable. Missing mandatory coverage blocks generation and never permits inventing or reintroducing an explicitly excluded scenario.",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "The checklist contains at least one '- Happy path:', '- Edge case:', and '- Error handling:' line, plus every applicable requirement-backed state transition. If requirements provide no in-scope edge or error scenario, generation stops for clarification.",
+        "error_message": "Checklist is missing mandatory happy-path, edge-case, or error-handling coverage, or includes an invented or explicitly out-of-scope scenario."
+      }
+    },
+
+    {
+      "id": "EVAL-CHECKLIST-003",
+      "category": "checklist_format",
+      "description": "Test execution description updates are provenance and revision guarded",
+      "rule": "A Test execution description is replaceable only when empty, legacy-generated, or matched by task ID and canonical rendered-text SHA-256 in the deployment-manifest.json beside its checklist files. Canonicalization: HTML-decode transport content; extract rendered lines; trim each line; discard empty lines; join with LF (\\n); encode as UTF-8; calculate SHA-256. Every ADO patch must test the current work-item revision",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "After exact rendered-line verification, deployment-manifest.json records pbi_id, task_id, checklist_path, deployed_sha256, and revision. A stale hash, mismatched task, unrelated description, or revision conflict blocks replacement",
+        "error_message": "Checklist attachment is not safely owned or revision guarded."
+      }
+    },
+
+    {
+      "id": "EVAL-SOURCE-001",
+      "category": "source_analysis",
+      "description": "Requirement links are classified relevant/unrelated before fetching, bounding traversal without silently skipping true requirement references",
+      "rule": "Before fetching an embedded Confluence link, classify it from link text, surrounding sentence, and page title as relevant or unrelated to the feature under test. Fetch only relevant links. A cap hit after classification is reported with every still-queued relevant page listed, never treated as a silent partial read.",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "The requirement markdown or agent output lists which discovered links were fetched (relevant) and which were excluded without fetching (unrelated), with a reason for each exclusion. No page is fetched without a prior classification decision recorded. If a page cap is reached, every unread page still classified relevant is listed explicitly rather than omitted.",
+        "error_message": "Links were fetched without a recorded relevance classification, or a cap/limit was hit without listing the unread relevant pages."
+      }
+    },
+
+    {
+      "id": "EVAL-SOURCE-002",
+      "category": "source_analysis",
+      "description": "All root sources (Description, Acceptance Criteria, every comment) are read; conflicts and out-of-scope statements are logged and preserved",
+      "rule": "PBI Description, Acceptance Criteria, and every comment are treated as requirement sources; ADO Related Work items are never a requirement source. Discrepancies between sources are recorded with precedence (canonical reference over comment; later revision over earlier, same-kind sources) or flagged to the user when ambiguous. Explicit out-of-scope statements from any source are never reintroduced as a generated scenario.",
+      "assertion": {
+        "type": "semantic_check",
+        "description": "Output or requirement markdown shows evidence that comments were read (not just Description), that any factual disagreement between sources is recorded with a chosen or flagged precedence, and that no generated test case or checklist item covers a scenario a source explicitly excluded.",
+        "error_message": "A comment was not read, a source conflict was silently resolved without record, or an explicitly out-of-scope scenario was generated."
+      }
+    }
+  ],
+
+  "scoring": {
+    "description": "Each evaluation is binary (pass/fail). Format rules are blocking; quality checks are advisory.",
+    "categories": {
+      "csv_format": {
+        "weight": "blocking",
+        "description": "All csv_format evals must pass. A single failure means the CSV cannot be imported into Azure DevOps."
+      },
+      "navigation_paths": {
+        "weight": "blocking",
+        "description": "All navigation_paths evals must pass. Wrong paths produce incorrect test steps."
+      },
+      "skill_triggering": {
+        "weight": "high",
+        "description": "Skill must trigger on natural-language test-case requests without explicit skill invocation."
+      },
+      "template_selection": {
+        "weight": "high",
+        "description": "Portal vs service template selection must be correct."
+      },
+      "checklist_format": {
+        "weight": "blocking",
+        "description": "All checklist format and scope checks must pass before a checklist is attached to Azure DevOps."
+      },
+      "source_analysis": {
+        "weight": "blocking",
+        "description": "Requirement gathering must classify links before fetching, read every root source including comments, and preserve conflicts/out-of-scope statements. Failures here mean generation started from an incomplete or unbounded requirement picture."
+      },
+      "output_quality": {
+        "weight": "advisory",
+        "description": "Quality checks should pass but do not block import. Failures indicate incomplete or low-quality output."
+      }
+    },
+    "pass_threshold": {
+      "blocking": 1.0,
+      "high": 1.0,
+      "advisory": 0.75
+    }
+  },
+
+  "how_to_run": {
+    "description": "These evals are designed for both automated validation and manual review.",
+    "automated": {
+      "csv_format_checks": "Run a script against any generated CSV in qa-output/test-cases/ to validate regex assertions. All regex patterns are self-contained.",
+      "example_command": "python .github/skills/write-test-cases/scripts/validate_csv.py qa-output/test-cases/<name>-test-cases.csv",
+      "csv_example_command": "python .github/skills/write-test-cases/scripts/validate_csv.py qa-output/test-cases/<name>-test-cases.csv",
+      "checklist_format_checks": "Run the checklist validator against every generated .txt checklist before attachment.",
+      "checklist_example_command": "python .github/skills/write-test-cases/scripts/validate_checklist.py qa-output/test-cases/sprint-<slug>/checklists/<name>-checklist.txt"
+    },
+    "manual": {
+      "skill_triggering": "Send each prompt to Copilot CLI and verify the write-test-cases skill is invoked (check timeline for Skill tool call).",
+      "output_quality": "Open generated CSV files and review them against the quality checklist in SKILL.md.",
+      "checklist_scope": "Compare every checklist with its requirement coverage matrix and explicit exclusions; structural validation cannot decide semantic applicability.",
+      "source_analysis": "Review the requirement markdown's Source Log, Conflicts, and Out of Scope sections (sprint pipeline) or the inline gathering summary (ad hoc); confirm comments were read, unrelated links were excluded without fetching, and no out-of-scope statement resurfaced in the generated output."
+    },
+    "references": {
+      "skill": ".github/skills/write-test-cases/SKILL.md",
+      "templates": ".github/skills/write-test-cases/templates/",
+      "testing_principles": ".github/skills/write-test-cases/references/testing-principles.md",
+      "example_output": "qa-output/test-cases/"
+    }
+  }
+}

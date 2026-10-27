@@ -1,0 +1,47 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","[Describe the bulk ledger posting scenario — e.g. 'Payment-fee bulk posting sent to LEDGER when ShouldBillFees = False']",,,,"ShopApp\Your Team","","Design",[COMPONENT — ORD/PAY/SHP/INV depending on which module initiates the bulk]
+,,,"1","Create [entity] with Status = Open, FeePeriod.EndDate = <EndDate>, FeeSchedule.Amount = <FeeAmount>, and <CorrelationId>","[Entity] is stored with the listed values and CorrelationId = <CorrelationId>",,,,
+,,,"2","Trigger the action that initiates the bulk: [e.g. background process detects the expired FeePeriod / background process fires end-of-day]","The [MODULE] module begins the bulk posting flow",,,,
+,,,"3","Search LEDGER bulk postings using <CorrelationId> and open StartBulkCommand","LEDGER receives StartBulkCommand with:
+- BulkReference = [e.g. 'PAY' + <DateTime> + 'FEE']
+- BulkType = '[e.g. Payment Fee]'
+- BulkName = '[e.g. Payment Fee' + <DDMMYY>]'
+- Source = '[e.g. PAY]'",,,,
+,,,"4","Open CreateBulkPostingCommand for <CorrelationId> in LEDGER and inspect its posting header","LEDGER displays these posting header values:
+- PostingIdentifier = [e.g. 'PAY' + <DateTime> + <AccountNumber> + 'Fee']
+- BusinessTypeCode = '[e.g. Payment]'
+- IsFinal = '[Yes / No]'
+- Source = '[e.g. PAY]'
+- PostingGroup.GroupTypeCode = '[e.g. Payment Fee]'
+- PostingGroup.GroupReference = [e.g. value ending in 'FEE']
+- PostingGroup.GroupName = '[e.g. Payment Fee' + <DDMMYY>]'",,,,
+,,,"5","Inspect the order posting for <PostingIdentifier> in LEDGER","LEDGER displays these order posting values:
+- OrderPostingTypeCode = '[e.g. FeeCharge]'
+- CaseTypeCode = '[e.g. Scheduled Fee]'
+- PostingDate = <BusinessDate>
+- ValueDate = <ValueDate>
+- DescriptionStoreLanguage = '[e.g. Fee Payment <AccountNumber>]'
+- StoreUniqueIdentifier = <StoreNumber>
+- StoreClass = [Retail / Wholesale / Internal]
+- StoreType = [as stored on Store]",,,,
+,,,"6","Inspect the account line for <PostingIdentifier> in LEDGER","LEDGER displays this account line:
+- AccountUniqueIdentifier = [e.g. Order.BillingAccountNumber when ShouldBillFees = False]
+- BookCurrencyISOCode = <CurrencyISOCode>
+- UnitPrice = 1
+- Quantity = [sum of Book currency amount of attributions]
+- AttributionTypeCode = '[e.g. FeeReceivable — check authoritative Attribution type reference page]'
+- SourceCurrencyAmount = [e.g. FeeSchedule.Amount * -1] (rounded to currency decimals)
+- BookCurrencyAmount = SourceCurrencyAmount",,,,
+,,,"7","Open EndBulkCommand for <CorrelationId> in LEDGER","LEDGER receives EndBulkCommand with:
+- BulkReference matches the BulkReference from the StartBulkCommand
+- NrOfPostings = total number of CreateBulkPostingCommands sent in this bulk
+- Source = '[e.g. PAY]'",,,,
+
+"","Test Case","[Second bulk scenario — e.g. variant account routing when ShouldBillFees = True]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+,,,"1","Create [entity] with ShouldBillFees = True, AccountNumber = <AccountNumber>, and <CorrelationId>","[Entity] is stored with ShouldBillFees = True and CorrelationId = <CorrelationId>",,,,
+,,,"2","Trigger [named bulk process] for <CorrelationId>","The [MODULE] module begins the bulk posting flow for CorrelationId = <CorrelationId>",,,,
+,,,"3","Search LEDGER bulk postings using <CorrelationId> and open StartBulkCommand","[BulkReference = <ExpectedBulkReference>; BulkType = <ExpectedBulkType>; BulkName = <ExpectedBulkName>; Source = <ExpectedSource>]",,,,
+,,,"4","Open CreateBulkPostingCommand for <CorrelationId> in LEDGER","[PostingIdentifier = <ExpectedIdentifier>; BusinessTypeCode = <ExpectedBusinessType>; Source = <ExpectedSource>]",,,,
+,,,"5","Inspect the order posting for <PostingIdentifier> in LEDGER","[OrderPostingTypeCode = <ExpectedType>; CaseTypeCode = <ExpectedCase>; PostingDate = <BusinessDate>; ValueDate = <ValueDate>]",,,,
+,,,"6","Inspect the account line for <PostingIdentifier> in LEDGER","[AccountUniqueIdentifier = <AccountNumber>; AttributionTypeCode = <ExpectedAttribution>; SourceCurrencyAmount = <ExpectedAmount>]",,,,
+,,,"7","Open EndBulkCommand for <CorrelationId> in LEDGER","[BulkReference = <ExpectedBulkReference>; NrOfPostings = <ExpectedCount>; Source = <ExpectedSource>]",,,,

@@ -1,0 +1,14 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","UnitCost is stored when allocation stock comes from LEDGER",,,,"ShopApp\Your Team","","Design",SHP
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Go to Shipment Portal and create a new shipment (eg: split shipment across two warehouses); record <ShipmentReference>.","The shipment is created and visible in SHP01, Shipment Portal with Reference = <ShipmentReference>.",,,,
+,,,"3","Trigger determine allocation with stock coming from LEDGER for <ShipmentReference>.","The determine allocation process completes for ShipmentReference = <ShipmentReference>.",,,,
+,,,"4","Query the database table Shp.Allocation: SELECT UnitCost FROM Shp.Allocation WHERE ShipmentReference = <ShipmentReference>.","Exactly one row is returned for ShipmentReference = <ShipmentReference>.",,,,
+,,,"5","Verify UnitCost in the Shp.Allocation database row for <ShipmentReference>.","UnitCost = the value received in the LEDGER allocation response (not NULL); ShipmentReference = <ShipmentReference>.",,,,
+
+"","Test Case","UnitCost is NULL when allocation stock comes from ERP",,,,"ShopApp\Your Team","","Design",SHP
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Go to Shipment Portal and create a new shipment (eg: split shipment across two warehouses); record <ShipmentReference>.","The shipment is created and visible in SHP01, Shipment Portal with Reference = <ShipmentReference>.",,,,
+,,,"3","Trigger determine allocation with stock coming from ERP for <ShipmentReference>.","The determine allocation process completes for ShipmentReference = <ShipmentReference>.",,,,
+,,,"4","Query the database table Shp.Allocation: SELECT UnitCost FROM Shp.Allocation WHERE ShipmentReference = <ShipmentReference>.","Exactly one row is returned for ShipmentReference = <ShipmentReference>.",,,,
+,,,"5","Verify UnitCost in the Shp.Allocation database row for <ShipmentReference>.","UnitCost = NULL; ShipmentReference = <ShipmentReference>.",,,,

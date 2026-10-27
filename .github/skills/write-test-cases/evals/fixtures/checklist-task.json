@@ -1,0 +1,38 @@
+{
+  "pbi_id": 900201,
+  "id": 900202,
+  "rev": 12,
+  "fields": {
+    "System.WorkItemType": "Task",
+    "System.Title": "Test execution",
+    "System.Description": "## Test checklist\n- [ ] [Functional] Valid invoice submission creates an approved invoice"
+  },
+  "expected_patch": [
+    {
+      "op": "test",
+      "path": "/rev",
+      "value": 12
+    },
+    {
+      "op": "replace",
+      "path": "/fields/System.Description",
+      "value": "<div>- Happy path: Valid invoice submission creates an approved invoice</div><div>- Edge case: Invoice with Amount equal to minimum 0 is accepted</div><div>- Error handling: Invoice with Amount below 0 is rejected with message Amount must be at least 0</div><div>- State transition: Submitting a valid Draft invoice moves it to Approved without changing InvoiceNumber</div>"
+    }
+  ],
+  "mocked_response": {
+    "id": 900202,
+    "rev": 13,
+    "fields": {
+      "System.WorkItemType": "Task",
+      "System.Title": "Test execution",
+      "System.Description": "<div>- Happy path: Valid invoice submission creates an approved invoice</div><div>- Edge case: Invoice with Amount equal to minimum 0 is accepted</div><div>- Error handling: Invoice with Amount below 0 is rejected with message Amount must be at least 0</div><div>- State transition: Submitting a valid Draft invoice moves it to Approved without changing InvoiceNumber</div>"
+    }
+  },
+  "expected_manifest_entry": {
+    "pbi_id": 900201,
+    "task_id": 900202,
+    "checklist_path": "qa-output\\test-cases\\sprint-999\\checklists\\900201-invoice-approval-checklist.txt",
+    "deployed_sha256": "8d7571732fcc2dd0886e611117d53ea09b45eb137a91722eb944f5fa92251885",
+    "revision": 13
+  }
+}

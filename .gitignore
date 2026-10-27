@@ -1,0 +1,20 @@
+# Generated QA artifacts
+qa-output/
+
+# Secrets — never commit real values
+.env
+.env.*
+!*.env.example
+
+# Python caches / environments
+.venv/
+__pycache__/
+*.pyc
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/

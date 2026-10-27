@@ -1,0 +1,20 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","[Describe the Shipment scenario being tested — plain sentence, no TC-prefix]",,,,"ShopApp\Your Team","","Design",SHP
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Navigate to SHP00, Shipments → SHP01, Shipment Portal and search for a [Carrier / Manual / other source] Shipment with status [Dispatched / other] [and any date filter, e.g. Created Date within the last 90 days].","SHP01, Shipment Portal screen opens.",,,,
+,,,"3","Open the Details screen for the located Shipment.","The Shipment Details screen opens.",,,,
+,,,"4","[Locate / Inspect / Verify] [the element or behaviour being tested, e.g. the Reroute button].","[Expected UI state — e.g. The Reroute button is visible and active (enabled and clickable).]",,,,
+,,,"5","[Optional: Perform an action and verify the outcome — e.g. Click the Reroute button, confirm the warning dialog, click Ok].","[Expected outcome — e.g. Cancellations are sent to LEDGER and EVENTBUS; the Shipment returns to editable state.]",,,,
+
+"","Test Case","[Second test case title]",,,,"ShopApp\Your Team","","Design",SHP
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Navigate to SHP00, Shipments → SHP01, Shipment Portal and search for [criteria].","SHP01, Shipment Portal screen opens.",,,,
+,,,"3","Open the Details screen for the located Shipment.","The Shipment Details screen opens.",,,,
+,,,"4","[Action or verification step]","[Expected result]",,,,
+
+"","Test Case","[SHP allocation variant — use this pattern when testing a Shp.Allocation backend change: Login → Create shipment → Trigger allocation → Query DB → Verify field]",,,,"ShopApp\Your Team","","Design",SHP
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"2","Go to Shipment Portal and create a new shipment (eg: split shipment across two warehouses); record <ShipmentReference>.","The shipment is created and visible in SHP01, Shipment Portal with Reference = <ShipmentReference>.",,,,
+,,,"3","Trigger determine allocation with stock coming from [LEDGER / ERP].","The determine allocation process completes for ShipmentReference = <ShipmentReference>.",,,,
+,,,"4","Query the database: SELECT [FieldName] FROM Shp.Allocation WHERE ShipmentReference = <ShipmentReference>.","Exactly one row is returned for ShipmentReference = <ShipmentReference>.",,,,
+,,,"5","Verify FieldName in the Shp.Allocation row for <ShipmentReference>.","FieldName = <ExpectedValue>; ShipmentReference = <ShipmentReference>.",,,,

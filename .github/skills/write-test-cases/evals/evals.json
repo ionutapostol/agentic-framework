@@ -1,0 +1,334 @@
+{
+  "skill_name": "write-test-cases",
+  "description": "Manual regression fixtures for the write-test-cases skill. Each case is a known scenario run by a human before changing skill behaviour.",
+  "how_to_run": "Not CI-gated — no automated qualitative grader. For each eval: (1) load the prompt into Copilot Chat, (2) generate the CSV, (3) run scripts/validate_csv.py for structural format rules, (4) eyeball the output against the expectations checklist.",
+  "maintenance": "Keep small and high-signal. Prune stale cases. Update when SKILL.md or requirements change. Don't add cases without a clear regression they guard. Evals 8, 11, and 12 reference wiki pages at your-confluence.example.com; point them at real pages (or local exports) in your own wiki before running.",
+  "evals": [
+    {
+      "id": 1,
+      "purpose": "Portal template completeness — navigation path, Login step, ORD component, output path, and CSV format all correct.",
+      "prompt": "create happy-path test cases for the order entry screen. The user can navigate to ORD00, Orders → ORD01, Order Portal and click New to open the Order Entry screen. They fill in mandatory fields (Customer, Currency, Order Total, Delivery Speed, Delivery Date, Discount Rate) and click Save. The order is created with status Placed. Use the requirements at .github/skills/write-test-cases/requirements/order-entry.md",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with correct headers, a Login shared step row (1000), navigation to ORD00/ORD01, plain title sentences (no TC-prefix), ORD in the Component column, and at least one happy-path test case covering the Save flow.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/order-entry.md",
+        ".github/skills/write-test-cases/templates/template-portal.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "At least one test case header row has Work Item Type = 'Test Case'",
+        "Login shared step row appears with ID 1000 and Work Item Type 'Shared Steps'",
+        "Navigation steps use 'ORD00, Orders → ORD01, Order Portal' (not old ORDER02 path)",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "No row has empty ID and Work Item Type = 'Shared Steps' (empty-ID Shared Steps rows forbidden)",
+        "Component column value is 'ORD' on all test case header rows",
+        "Area Path column is set (not empty) on all test case header rows",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 2,
+      "purpose": "Service template — no Login step, PAY component, backend service with no portal UI.",
+      "prompt": "create happy-path test cases for the service fee calculation. Use the requirements at .github/skills/write-test-cases/requirements/service-fee-calculation.md. This is a backend service with no portal UI — no login needed.",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with correct headers, no Login shared step, PAY in the Component column, plain title sentences, and test cases covering: PAY service trigger, request file creation, response consumption, and LEDGER ledger posting.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/service-fee-calculation.md",
+        ".github/skills/write-test-cases/templates/template-service.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "No Login shared step row (ID 1000) appears — this is a service test, not a portal test",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Component column value is 'PAY' on all test case header rows",
+        "Area Path column is set on all test case header rows",
+        "At least one test case covers triggering the PAY service",
+        "At least one test case covers consuming the PAY response and storing data",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 3,
+      "purpose": "Prompt-only inference — skill infers maker/checker order-approval flow without a requirements file.",
+      "prompt": "write test cases for an order approval flow. The Maker user enters a new order with a shipping fee; a different Checker user then approves it. After approval the order status changes to Placed. This is a portal flow — no requirements file provided.",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv using the portal template (Login shared step 1000), ORD component, and at least one test case covering Maker entry and a separate test case (or step) covering Checker approval and status verification — inferred from the prompt description alone.",
+      "files": [],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "Login shared step row appears with ID 1000 (portal test requires login)",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Component column value is 'ORD'",
+        "At least one test case covers the Maker entering the order",
+        "At least one test case covers the Checker approving the order (PendingReview → Placed)",
+        "At least one step verifies the order status changes to Placed after approval",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 4,
+      "purpose": "Prompt-only feature spec — skill derives test cases from inline description alone, no requirements file; ORD popup navigation feature.",
+      "prompt": "write test cases for a new feature: when a user opens the Order View popup from the Portal and clicks the Previous/Next navigation buttons, the view should cycle through orders respecting the current portal sort order and filters. When on the first order, clicking Previous shows the last order. When on the last order, clicking Next shows the first order. The view opens as a popup (not a new tab). This is a portal UI feature in the Orders module.",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with correct headers, Login shared step (1000), ORD component, portal navigation, and test cases covering forward/backward cycling, wrap-around behavior, and filter/sort awareness — all derived from the inline description without a requirement file.",
+      "files": [],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "Login shared step row appears with ID 1000 (portal test)",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Component column value is 'ORD'",
+        "Area Path column is set on all test case header rows",
+        "At least one test case covers clicking Next to cycle forward through orders",
+        "At least one test case covers clicking Previous to wrap around from first to last order",
+        "Filename is derived from the feature description in kebab-case (no requirement file name to use)"
+      ]
+    },
+    {
+      "id": 5,
+      "purpose": "State-transition coverage from requirements file — PendingReview→Placed, PendingReview→Rejected, ShippingFee>0 trigger, different-user rule.",
+      "prompt": "create test cases with full state transition coverage for the order approval flow. Use the requirements at .github/skills/write-test-cases/requirements/order-approval-new-entry.md. I need all state transitions tested: PendingReview → Placed (approve), PendingReview → Rejected (reject), and the conditions that lead to PendingReview status (ShippingFee > 0). Also test the approval permission rule — the approver must be a different user than the one who entered the order.",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with state transition test cases covering all valid transitions (PendingReview→Placed, PendingReview→Rejected), the trigger condition (ShippingFee > 0), and the different-user approval rule. Portal template with Login shared step, ORD component.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/order-approval-new-entry.md",
+        ".github/skills/write-test-cases/templates/template-portal.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "Login shared step row appears with ID 1000 (portal test)",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Component column value is 'ORD'",
+        "At least one test case covers PendingReview → Placed transition (successful approval)",
+        "At least one test case covers PendingReview → Rejected transition",
+        "At least one test case verifies the ShippingFee > 0 condition triggers PendingReview status",
+        "At least one test case verifies approval is disabled when the same user tries to approve",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 6,
+      "purpose": "Cross-module service test — skill picks service template (no Login) for a flow that produces a ledger posting to LEDGER.",
+      "prompt": "create test cases for the order confirmation posting flow. Use the requirements at .github/skills/write-test-cases/requirements/order-confirmation-posting.md. This is a cross-module flow: after an order is approved and an AccountNumber is created (via INV), the system creates a ledger posting sent to LEDGER. The posting has two account line instances — a receivable line on the order account and a revenue line on the billing account. This is a service/integration test — no portal UI login needed.",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv using the service template (no Login step), covering the CreateSinglePostingCommand with correct mapping fields, both account line instances (receivable + revenue), and the posting identifier format. Component should reflect the primary module being tested.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/order-confirmation-posting.md",
+        ".github/skills/write-test-cases/templates/template-service.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "No Login shared step row (service/integration test, no UI login)",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "At least one test case verifies the receivable account line (on the order account)",
+        "At least one test case verifies the revenue account line (on the billing account)",
+        "At least one test case covers the posting identifier format (ORD + DateTime + AccountNumber + Confirm)",
+        "Area Path column is set on all test case header rows",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 7,
+      "purpose": "SHP portal navigation pattern — two-step navigate+open-details rows, 30-day boundary logic, BE+FE split.",
+      "prompt": "create test cases for the SHPbe: Limit usage of Reprint Label button in View details PBI. Intro: Button Reprint Label should only be available when System Date - Dispatch Date <= 30 days. Scope: Button is only available for CARRIER source, Dispatched status, and within 30 days. Validate on both BE and FE.",
+      "expected_output": "A CSV file with SHP portal test cases using SHP01, Shipment Portal for navigation, splitting portal navigation and opening a record's Details into two separate steps each with its own Expected result. No exact-day boundary tests (no 'exactly 30 days ago' test case). UI tests use Login shared step 1000. At least one backend test case.",
+      "files": [],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "SHP portal navigation steps use 'SHP01, Shipment Portal' — not 'SHP00, Shipments' alone",
+        "Navigation step and 'Open the Details screen' step are separate rows, each with a non-empty Step Expected",
+        "At least one test case covers button active scenario (within 30 days, CARRIER, Dispatched)",
+        "At least one test case covers button disabled scenario (> 30 days)",
+        "At least one test case covers button not visible (non-CARRIER source)",
+        "At least one backend/service test case validates the 30-day enforcement at BE layer",
+        "Component column value is 'SHP' on all test case header rows",
+        "Area Path column is set on all test case header rows"
+      ]
+    },
+    {
+      "id": 8,
+      "purpose": "Authoritative-link traversal — skill reads the wiki page AND all embedded reference links; catches code-value discrepancies (e.g. GoodsTotal vs OrderTotal).",
+      "prompt": "write happy-path test cases for the following feature. For details of the ledger posting see https://your-confluence.example.com/spaces/DOCS/pages/123459/Order+Confirmation+Posting — read all embedded links in that page for additional detail before writing test cases.",
+      "expected_output": "Agent reads the linked wiki page AND all embedded reference links within it (Business type, Order posting type, Case type, Attribution type) before generating test cases. The generated CSV must use authoritative code values from those reference pages (e.g. AttributionTypeCode = 'GoodsTotal', not 'OrderTotal'). Any discrepancy between the requirements page and the authoritative reference pages is flagged to the user.",
+      "files": [],
+      "expectations": [
+        "Agent reads the primary linked wiki page before generating test cases",
+        "Agent reads all embedded reference links found within the primary page (not just the top-level page)",
+        "Generated test cases use code values from the authoritative reference pages, not just the values stated in the requirement mapping table",
+        "If a code value in the requirement mapping conflicts with the authoritative reference (e.g. 'OrderTotal' vs 'GoodsTotal'), the agent flags the discrepancy to the user and uses the authoritative value",
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component"
+      ]
+    },
+    {
+      "id": 9,
+      "purpose": "Background-service bulk template — no Login step, StartBulkCommand/CreateBulkPostingCommand/EndBulkCommand, IsFeePrepaid branching.",
+      "prompt": "write exclusive happy path test cases for PBI: ORD - Ledger posting order fee. A background process checks whether an order fee is due. If a fee charge meets the condition (FeeSchedule.DueDate <= BusinessDate+1), a ledger posting is created to LEDGER as a bulk (StartBulkCommand + CreateBulkPostingCommand + EndBulkCommand). Two scenarios: IsFeePrepaid = False (post to BillingAccountNumber) and IsFeePrepaid = True (post to AccountNumber).",
+      "expected_output": "A CSV file at qa-output/test-cases/ord-ledger-posting-order-fee-test-cases.csv using the bulk ledger posting template (no Login step). Two happy-path test cases: one per IsFeePrepaid value. Each test case walks through StartBulkCommand, CreateBulkPostingCommand (posting header, order posting, account line with FeeChargeAmount attribution), and EndBulkCommand. Component = ORD.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/3-bulk-ledger-postings-fees.md",
+        ".github/skills/write-test-cases/templates/template-bulk-ledger-posting.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "No Login shared step row — this is a service/integration test",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Component column value is 'ORD' on all test case header rows",
+        "Area Path column is set on all test case header rows",
+        "At least one test case covers IsFeePrepaid = False routing to BillingAccountNumber",
+        "At least one test case covers IsFeePrepaid = True routing to AccountNumber",
+        "Each test case verifies StartBulkCommand fields (BulkReference, BulkType, Source)",
+        "Each test case verifies CreateBulkPostingCommand posting header (BusinessTypeCode, IsFinal, Source, PostingGroup)",
+        "Each test case verifies order posting fields (OrderPostingTypeCode = FeeCharge, CaseTypeCode = Scheduled Fee)",
+        "Each test case verifies account line attribution (AttributionTypeCode = FeeChargeAmount, SourceCurrencyAmount = Amount * -1)",
+        "Each test case verifies EndBulkCommand fields (BulkReference, NrOfPostings, Source)",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 10,
+      "purpose": "SHP portal template for an integration test — skill uses portal template (not service) because a portal action triggers the integration; UnitCost field.",
+      "prompt": "create test cases for: extend Shp.Allocation with UnitCost field, store value from LEDGER allocation response, NULL via ERP",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with two test cases covering the LEDGER path and the ERP path. Both use the SHP portal template (Login shared step 1000) — not the service template — because testing requires creating a shipment in the portal and triggering allocation. Steps must be concrete (no 'Prepare preconditions'). Component = SHP.",
+      "files": [
+        ".github/skills/write-test-cases/requirements/shp-allocation-unit-cost.md",
+        ".github/skills/write-test-cases/templates/template-shipment-portal.csv",
+        ".github/skills/write-test-cases/references/golden-example-shipment-allocation.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "Login shared step row appears with ID 1000 — portal template required, not service template",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "Exactly two test cases are generated — one for LEDGER path, one for ERP path",
+        "Component column value is 'SHP' on all test case header rows",
+        "Area Path column is set on all test case header rows",
+        "At least one test case step action references creating a shipment in the portal (e.g. 'create a new shipment')",
+        "At least one test case step action references triggering allocation",
+        "No step action contains the phrase 'Prepare preconditions'",
+        "Test case for LEDGER path verifies UnitCost is populated (not NULL)",
+        "Test case for ERP path verifies UnitCost is NULL",
+        "Terminology uses 'ERP' for the legacy system"
+      ]
+    },
+    {
+      "id": 11,
+      "purpose": "Multi-wiki traversal + ordering constraint — reads three wiki pages, verifies fee-before-closing ordering, both IsFeePrepaid branches, Order.Status post-condition.",
+      "prompt": "write happy-path test cases for PBI: ORD - Ledger postings closing Order. A background process checks if an order's DeliveryDate expires (DeliveryDate <= BusinessDate+1 AND Status=Placed). If it does, the process creates a bulk ledger posting for the order fee (if applicable) and then a bulk ledger posting for closing. The closing posting must be created AFTER the fee posting. After both postings are sent, Order.Status changes to Fulfilled. Late-delivery compensation is out of scope. Authoritative sources — read these before generating: Closing of Order (https://your-confluence.example.com/spaces/DOCS/pages/123461/2.+Closing+of+Order), Bulk Ledger Postings - Fees (https://your-confluence.example.com/spaces/DOCS/pages/123462/3.+Bulk+Ledger+Postings+-+Fees), Expiration of Order (https://your-confluence.example.com/spaces/DOCS/pages/123463/Expiration+of+Order). The fee posting rules are also in the local requirements file provided.",
+      "expected_output": "A CSV file at qa-output/test-cases/ord-ledger-postings-closing-order-test-cases.csv using the bulk ledger posting template (no Login step). Test cases cover: background job trigger condition, fee bulk posting (StartBulkCommand + CreateBulkPostingCommand + EndBulkCommand), closing bulk posting (two account lines: debit Order.AccountNumber + credit Order.BillingAccountNumber), ordering (closing after fee), and Order.Status → Fulfilled post-condition. IsFeePrepaid = True/False branching. Component = ORD.",
+      "files": [
+        ".github/skills/write-test-cases/templates/template-bulk-ledger-posting.csv",
+        ".github/skills/write-test-cases/requirements/3-bulk-ledger-postings-fees.md"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "Output filename is ord-ledger-postings-closing-order-test-cases.csv",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "No Login shared step row — background service, no portal UI",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "No step action contains the phrase 'Prepare preconditions'",
+        "No unresolved template placeholders remain (e.g. [COMPONENT], <AccountNumber>, 'correct fields')",
+        "Component column value is 'ORD' on all test case header rows",
+        "Area Path column is set on all test case header rows",
+        "At least one test case covers the trigger condition (DeliveryDate <= BusinessDate+1 AND Status=Placed)",
+        "At least one test case covers the fee bulk ledger posting sent to LEDGER",
+        "At least one test case covers the closing bulk ledger posting sent to LEDGER",
+        "At least one test case verifies the closing posting is created AFTER the fee posting",
+        "At least one test case covers IsFeePrepaid = False (post to BillingAccountNumber)",
+        "At least one test case covers IsFeePrepaid = True (post to AccountNumber, amount includes fee)",
+        "At least one test case verifies Order.Status changes to Fulfilled after postings are sent",
+        "Closing bulk posting includes two account line instances: debit Order.AccountNumber and credit Order.BillingAccountNumber",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 12,
+      "purpose": "Exact wiki formula extraction — skill reads the wiki page for price formulas and uses exact named variables (UnitCost, ReturnedQty, ShippedQty, Rebate, BundleShare, InsuredAmount), not generic placeholders.",
+      "prompt": "write happy-path test cases for PBI: SHPloc: Change Price in Stock Account Lines of the Primary Ledger Posting. Currently Price defaults to 0. Exceptions require calculating Price from Shp.Allocation.UnitCost. Scope: Return to stock; Partial refund; Bundle split and Bundle merge; Lost parcel claim. From ERP, unit cost is not received — default value = 0.000000. Authoritative source for the exact price formulas — read this before generating (use the confluence-assistant skill): https://your-confluence.example.com/pages/viewpage.action?pageId=123464&spaceKey=DOCS&title=Stock%2Bposting%2Bprice%2Bformulas",
+      "expected_output": "A CSV file at qa-output/test-cases/*-test-cases.csv with at least one test case covering each formula group, using the exact price formulas from the linked wiki page (the agent must consult it — do not invent or use generic placeholders). Expected formulas: Return to stock → Price = Shp.Allocation.UnitCost; Partial refund → UnitCost * ABS(ReturnedQty/ShippedQty); Bundle split/Bundle merge → (UnitCost - (Rebate/ReturnedQty)) * ABS(ReturnedQty/ShippedQty) * BundleShare (Rebate=0 for Bundle split); Lost parcel claim → Price = InsuredAmount; ERP → 0.000000 (an additional source path, not a posting-type group). Component = SHP.",
+      "files": [
+        ".github/skills/write-test-cases/templates/template-ledger-posting.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ (not inside the skill folder)",
+        "CSV header row exactly matches: ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component",
+        "No Login shared step row — this is a service/integration test (ledger posting flow)",
+        "No row has empty ID and Work Item Type = 'Shared Steps'",
+        "No test case title contains a TC-F-XXX: or TC-E-XXX: prefix",
+        "No step action contains the phrase 'Prepare preconditions'",
+        "No unresolved template placeholders remain (e.g. [COMPONENT], <StockItem>, 'correct fields')",
+        "Component column value is 'SHP' on all test case header rows",
+        "Area Path column is set on all test case header rows",
+        "At least one test case covers Return to stock (Price = Shp.Allocation.UnitCost)",
+        "At least one test case covers Partial refund (Price = UnitCost * ABS(ReturnedQty/ShippedQty))",
+        "At least one test case covers Bundle split or Bundle merge using the combined formula",
+        "At least one test case covers Lost parcel claim (Price = InsuredAmount from the ledger posting)",
+        "At least one test case covers the ERP path (Price = 0.000000)",
+        "Price formulas in Step Expected reference the correct named variables and operations (UnitCost, ReturnedQty, ShippedQty, Rebate, BundleShare) — not generic 'unit cost from Allocation table' placeholders; algebraically equivalent orderings are acceptable",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 13,
+      "purpose": "Backend observability regression — generated integration cases identify where and how each result is inspected and avoid vague mapping assertions.",
+      "prompt": "write happy-path service test cases for an adapter that consumes a file with SenderReference=<SenderReference>, forwards a CreateSinglePostingCommand, and creates a record. Requirements confirm EventType=ParcelDelivered, Processing=AUTO, and BusinessTypeCode=Fulfilment. Use Kibana to inspect adapter processing, LEDGER to inspect the command, and SHP01 to verify the created record.",
+      "expected_output": "A backend/integration CSV whose verification steps name Kibana, LEDGER, or SHP01; locate the same posting using <SenderReference> or another explicit correlation key; and assert exact confirmed fields and values instead of saying only that fields or values are mapped correctly.",
+      "files": [
+        ".github/skills/write-test-cases/templates/template-service.csv",
+        ".github/skills/write-test-cases/templates/template-ledger-posting.csv"
+      ],
+      "expectations": [
+        "Output file is written to qa-output/test-cases/ or one sprint-<slug> child directory",
+        "Every non-empty CSV row contains exactly 10 columns",
+        "No Login shared step is added unless SHP01 is used for verification",
+        "Every backend verification step names its observation point, such as Kibana, LEDGER, or SHP01",
+        "Every backend verification step includes <SenderReference>, <CorrelationId>, <PostingId>, or another explicit correlation key",
+        "Expected results assert EventType = ParcelDelivered, Processing = AUTO, and BusinessTypeCode = Fulfilment where applicable",
+        "No expected result uses vague phrases such as 'values mapped', 'source data mapped', 'correct fields', or 'expected values'",
+        "Generic assignments such as 'Result = success', 'Fields = mapped', and 'Status = OK' fail measurable-result validation",
+        "Concrete assignments and statuses such as 'EventType = ParcelDelivered' and 'Status = Placed' pass measurable-result validation",
+        "Concrete word-number counts such as 'One record is returned' and 'Two rows are returned' pass measurable-result validation",
+        "Steps using 'Assert API response', 'Validate API response', or 'Query Shp.Allocation table' are treated as backend assertions and require correlation",
+        "A step that opens a SHP01 or ORD01 portal results table remains a UI assertion and does not require backend correlation",
+        "A backend table or command remains a backend assertion when its wording also refers to a SHP01 or ORD01 record",
+        "No step action contains the phrase 'Prepare preconditions'",
+        "Every test case has at least one step row"
+      ]
+    },
+    {
+      "id": 14,
+      "purpose": "Test execution checklist regression — checklist output is plain text and always includes requirement-backed happy-path, edge-case, and error-handling coverage.",
+      "prompt": "Create a test checklist for PBI 900201, Invoice approval, and attach it to the mocked Task in evals/fixtures/checklist-task.json. Requirements: a valid Draft invoice submitted by an authorized approver becomes Approved; Amount=0 is the accepted minimum boundary; Amount below 0 is rejected with message Amount must be at least 0; the approved invoice keeps the same InvoiceNumber. Unauthorized users, API failures, and every other error scenario are explicitly out of scope. The deliberately happy-path-only source is evals/fixtures/checklist-happy-only.csv.",
+      "expected_output": "Create qa-output/test-cases/sprint-999/checklists/ and write 900201-invoice-approval-checklist.txt there with exactly the four specified literal hyphen-list lines. Apply the literal expected_patch from evals/fixtures/checklist-task.json, require the literal mocked_response, and write its literal expected_manifest_entry to deployment-manifest.json beside the checklist. The rendered description must exactly equal the four checklist lines.",
+      "files": [
+        ".github/skills/write-test-cases/references/testing-principles.md",
+        ".github/skills/write-test-cases/evals/fixtures/checklist-happy-only.csv",
+        ".github/skills/write-test-cases/evals/fixtures/checklist-task.json"
+      ],
+      "expectations": [
+        "Output path is qa-output/test-cases/sprint-999/checklists/900201-invoice-approval-checklist.txt",
+        "Line 1 is exactly: - Happy path: Valid invoice submission creates an approved invoice",
+        "Line 2 is exactly: - Edge case: Invoice with Amount equal to minimum 0 is accepted",
+        "Line 3 is exactly: - Error handling: Invoice with Amount below 0 is rejected with message Amount must be at least 0",
+        "Line 4 is exactly: - State transition: Submitting a valid Draft invoice moves it to Approved without changing InvoiceNumber",
+        "Every item has one literal '- ' prefix; no heading, number, checkbox, or bracketed category tag appears",
+        "Inline emphasis, strikethrough, blockquotes, raw HTML, and Markdown tables are rejected",
+        "validate_checklist.py exits 0 for the generated file",
+        "The legacy generated description is replaced rather than appended",
+        "The rendered Test execution description contains exactly the four checklist lines in order",
+        "The JSON Patch first tests /rev = 12 and then replaces /fields/System.Description",
+        "The deployment manifest records PBI 900201, Task 900202, revision 13, the sprint checklist path, and deployed SHA-256 8d7571732fcc2dd0886e611117d53ea09b45eb137a91722eb944f5fa92251885",
+        "A later replacement is allowed only when the manifest task ID and deployed SHA-256 match the current rendered description"
+      ]
+    }
+  ]
+}

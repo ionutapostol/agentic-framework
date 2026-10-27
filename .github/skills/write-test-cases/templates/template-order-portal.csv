@@ -1,0 +1,120 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","Cancel button is enabled in Portal for order with status Placed",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal and locate an order with Status = Placed","The order is visible in the Portal list with status = Placed",,,,
+,,,"3","Observe the Cancel action button for this order","The Cancel button is enabled and clickable for the order with Status = Placed",,,,
+"","Test Case","Open modify screen — all fields prefilled with stored data",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal and locate an order with Status = Placed","The order is visible in the Portal list",,,,
+,,,"3","Click the Modify action button for the order","The Order modify screen opens in a new tab",,,,
+,,,"4","Inspect all fields on the modify screen","All fields are prefilled with the stored data from the database:
+- CustomerNumber, AccountNumber, AccountName, CurrencyISOCode, OrderTotal, OrderDate, DeliveryDate, BillingAccount, DiscountRate, ShippingFee, SplitShipment, ExpressDelivery, GiftWrap
+All values match the saved order record",,,,
+"","Test Case","Only ExpressDelivery and GiftWrap are editable — all other fields read-only",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed","The Order modify screen opens",,,,
+,,,"3","Verify the ExpressDelivery field is editable","The ExpressDelivery dropdown (Yes/No) is enabled and can be changed",,,,
+,,,"4","Verify the GiftWrap field is editable","The GiftWrap dropdown (Yes/No) is enabled and can be changed",,,,
+,,,"5","Verify all other fields are read-only","The following fields are displayed as read-only and cannot be modified:
+CustomerNumber, AccountNumber, AccountName, CurrencyISOCode, OrderTotal, OrderDate, DeliveryDate, BillingAccount, DiscountRate, ShippingFee, SplitShipment",,,,
+"","Test Case","Save & New button is not present in modify screen",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed","The Order modify screen opens",,,,
+,,,"3","Inspect the toolbar buttons on the modify screen","The toolbar displays: Refresh, Save, Save and Close.
+The ""Save and New"" button is NOT present in the modify screen",,,,
+"","Test Case","Modify ExpressDelivery from No to Yes and save",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed and ExpressDelivery = No","The Order modify screen opens with ExpressDelivery = No",,,,
+,,,"3","Change ExpressDelivery from No to Yes","The ExpressDelivery dropdown is updated to Yes",,,,
+,,,"4","Click Save","A success message box is displayed confirming the order was saved.
+The ExpressDelivery field is now stored as Yes in the database",,,,
+"","Test Case","Modify GiftWrap from No to Yes and save",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed and GiftWrap = No","The Order modify screen opens with GiftWrap = No",,,,
+,,,"3","Change GiftWrap from No to Yes","The GiftWrap dropdown is updated to Yes",,,,
+,,,"4","Click Save","A success message box is displayed confirming the order was saved.
+The GiftWrap field is now stored as Yes in the database",,,,
+"","Test Case","Modify both ExpressDelivery and GiftWrap and save",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed, ExpressDelivery = No, GiftWrap = No","The Order modify screen opens with both fields set to No",,,,
+,,,"3","Change ExpressDelivery from No to Yes","The ExpressDelivery dropdown is updated to Yes",,,,
+,,,"4","Change GiftWrap from No to Yes","The GiftWrap dropdown is updated to Yes",,,,
+,,,"5","Click Save","A success message box is displayed confirming the order was saved.
+Both ExpressDelivery = Yes and GiftWrap = Yes are stored in the database",,,,
+"","Test Case","Modify order and Save and Close — returns to Portal",,,,"ShopApp\Your Team","","Design",ORD
+"1000","Shared Steps",,"1","Login",,,,,
+,,,"1.1","Navigate to @URL","Webpage appears with:
+- Header: ""Welcome to ShopApp""
+- Subheader ""Please Log In""
+- Two input fields: Username and Password
+- Selected checkbox ""Use Default Role""
+- Button : ""Login""",,,,
+,,,"1.2","Enter @Username",,,,,
+,,,"1.3","Enter @Password",,,,,
+,,,"1.4","Press button Login","ShopApp Home tab appears, showing all available menu options for the logged in user. User login name shown in the top right corner",,,,
+,,,"2","Navigate to ORD00, Orders → ORD01, Order Portal → click Modify on an order with Status = Placed","The Order modify screen opens",,,,
+,,,"3","Change ExpressDelivery from No to Yes","The ExpressDelivery dropdown is updated to Yes",,,,
+,,,"4","Click Save and Close","The order is saved successfully. The modify screen tab closes. The user is redirected to the Portal, which is refreshed and updated to reflect the modification",,,,

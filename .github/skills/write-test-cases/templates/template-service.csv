@@ -1,0 +1,14 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","[Describe the scenario being tested — plain sentence, no TC-prefix]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+,,,"1","Create [specific input data] with <CorrelationId> and record [all values used by later assertions]","[Input record or fixture exists with FieldA = <ValueA>, FieldB = <ValueB>, and CorrelationId = <CorrelationId>]",,,,
+,,,"2","Trigger [service or event name] with <CorrelationId>","[Named service or integration] accepts the trigger for CorrelationId = <CorrelationId>",,,,
+,,,"3","Open [named API response, output file, database table, queue, topic, or Kibana service trace] and locate the outgoing request using <CorrelationId>","[RequestFieldA = <ValueA>; RequestFieldB = <ValueB>; CorrelationId = <CorrelationId>]",,,,
+,,,"4","Open [named API response, output file, database table, or Kibana service trace] and locate the result using <CorrelationId>","[ResponseFieldA = <ExpectedA>; ResponseFieldB = <ExpectedB>; CorrelationId = <CorrelationId>]",,,,
+,,,"5","Query [named portal screen, API, or database table] using <CorrelationId>","[Status = <ExpectedStatus>; PersistedFieldA = <ExpectedA>; PersistedFieldB = <ExpectedB>]",,,,
+
+"","Test Case","[Second test case title]",,,,"ShopApp\Your Team","","Design",[COMPONENT]
+,,,"1","Create [variant-specific input data] with <CorrelationId>","[VariantField = <VariantValue>; CorrelationId = <CorrelationId>]",,,,
+,,,"2","Trigger [service or event name] with <CorrelationId>","[Named service or integration] accepts the trigger for CorrelationId = <CorrelationId>",,,,
+,,,"3","Open [named API response, output file, database table, queue, topic, or Kibana service trace] and locate the request using <CorrelationId>","[RequestField = <ExpectedRequestValue>]",,,,
+,,,"4","Open [named API response, output file, database table, or Kibana service trace] and locate the response using <CorrelationId>","[ResponseField = <ExpectedResponseValue>]",,,,
+,,,"5","Query [named portal screen, API, or database table] using <CorrelationId>","[Status = <ExpectedStatus>; VariantField = <VariantValue>]",,,,

@@ -1,0 +1,3 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Component
+"","Test Case","Valid invoice submission creates an approved invoice",,,,"ShopApp\Your Team","","Design",INV
+,,,"1","Submit a valid Draft invoice as an authorized approver","The invoice status is Approved and InvoiceNumber remains unchanged",,,,
