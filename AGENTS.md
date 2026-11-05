@@ -19,7 +19,8 @@ Generated artifacts land in `qa-output\` under the consuming repo root.
 
 Read [workflow prerequisites](.github/skills/README.md#prerequisites-by-workflow) before
 running a workflow. `uv` provisions Python/project dependencies, not external tools.
-The companion CLI project manages its own environment:
+The companion CLI project manages its own environment. It lives at `tools\pytools` (gitignored;
+copy or clone the `python-tools` repo there, without its `.git` if copied):
 
 ```powershell
 cd <repo>\tools\pytools
